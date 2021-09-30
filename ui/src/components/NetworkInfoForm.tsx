@@ -84,8 +84,14 @@ export const NetworkInfoForm = ({
 			m={4}
 			mt={5}
 		>
-			<Heading.h3 align="center" mb={4}>
-				Hi! Please choose your WiFi from the list
+			<Heading.h3
+				align="center"
+				mb={4}
+				width={400}
+				style={{ textAlign: 'justify' }}
+			>
+				Please choose the WiFi network from the list that you would like your
+				printer to connect to when it powers up.
 			</Heading.h3>
 
 			<Form
@@ -101,6 +107,7 @@ export const NetworkInfoForm = ({
 					width: '60%',
 					mx: '20%',
 					mt: 3,
+					bg: '#e3774c',
 					disabled: availableNetworks.length <= 0,
 				}}
 				submitButtonText={'Connect'}
