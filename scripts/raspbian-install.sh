@@ -159,17 +159,30 @@ confirm_installation() {
 }
 
 install_wfc() {
+    local _regex='browser_download_url": "\K.*i386\.tar\.gz'
     local _arch_url
     local _wfc_version
+    local _download_dir
 
-    ensure sudo mv /tmp/wifi-connect/wifi-connect $INSTALL_BIN_DIR
+    say "Retrieving latest release from $RELEASE_URL..."
+
+    _arch_url=$(ensure curl "$RELEASE_URL" -s | grep -hoP "$_regex")
+
+    say "Downloading and extracting $_arch_url..."
+
+    _download_dir=$(ensure mktemp -d)
+
+    ensure curl -Ls "$_arch_url" | tar -xz -C "$_download_dir"
+
+    ensure sudo mv "$_download_dir/wifi-connect" $INSTALL_BIN_DIR
 
     ensure sudo mkdir -p $INSTALL_UI_DIR
 
     ensure sudo rm -rdf $INSTALL_UI_DIR
 
-    ensure sudo mv /tmp/wifi-connect/ui $INSTALL_UI_DIR
+    ensure sudo mv "$_download_dir/ui" $INSTALL_UI_DIR
 
+    ensure rm -rdf "$_download_dir"
 
     _wfc_version=$(ensure wifi-connect --version)
 
