@@ -99,8 +99,6 @@ activate_network_manager() {
         if [ "$(service_active_state NetworkManager)" = "active" ]; then
             say 'NetworkManager is already active'
         else
-            confirm_installation
-
             disable_dhcpcd
 
             say 'Activating NetworkManager...'
