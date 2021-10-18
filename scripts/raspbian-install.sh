@@ -78,8 +78,6 @@ activate_network_manager() {
     if [ "$(service_load_state NetworkManager)" = "not-found" ]; then
         say 'NetworkManager is not installed'
 
-        confirm_installation
-
         # Do not install NetworkManager over running dhcpcd to avoid clashes
 
         say 'Downloading NetworkManager...'
@@ -144,48 +142,21 @@ service_active_state() {
     ensure systemctl -p ActiveState --value show "$1"
 }
 
-confirm_installation() {
-    if [ "$CONFIRMATION" = false ]; then
-        return
-    fi
-
-    printf '\33[1;36m%s:\33[0m ' "$NAME"
-
-    read -r -p "Continue to install NetworkManager and disable dhcpcd? [y/N] " response
-    response=${response,,}  # convert to lowercase
-    if [[ ! $response =~ ^(yes|y)$ ]]; then
-        exit 0
-    fi
-}
-
 install_wfc() {
-    local _regex='browser_download_url": "\K.*i386\.tar\.gz'
+    local _regex='browser_download_url": "\K.*aarch64\.tar\.gz'
     local _arch_url
     local _wfc_version
     local _download_dir
 
-    say "Retrieving latest release from $RELEASE_URL..."
-
     _arch_url=$(ensure curl "$RELEASE_URL" -s | grep -hoP "$_regex")
-
-    say "Downloading and extracting $_arch_url..."
-
     _download_dir=$(ensure mktemp -d)
-
     ensure curl -Ls "$_arch_url" | tar -xz -C "$_download_dir"
-
     ensure sudo mv "$_download_dir/wifi-connect" $INSTALL_BIN_DIR
-
     ensure sudo mkdir -p $INSTALL_UI_DIR
-
     ensure sudo rm -rdf $INSTALL_UI_DIR
-
     ensure sudo mv "$_download_dir/ui" $INSTALL_UI_DIR
-
     ensure rm -rdf "$_download_dir"
-
     _wfc_version=$(ensure wifi-connect --version)
-
     say "Successfully installed $_wfc_version"
 }
 
